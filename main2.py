@@ -1,21 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
-import math
-
-
-# =========================================================
-# DATOS DE LA PIEZA
-# =========================================================
-
-# Ejemplo de pieza en forma de L
-puntos_originales = [
-    (0, 0),
-    (4, 0),
-    (4, 1),
-    (1, 1),
-    (1, 4),
-    (0, 4)
-]
+from tkinter import ttk
 
 
 # =========================================================
@@ -31,6 +15,19 @@ ventana.configure(bg="#F4F6F8")
 
 
 # =========================================================
+# COLORES
+# =========================================================
+
+COLOR_FONDO = "#F4F6F8"
+COLOR_PANEL = "#FFFFFF"
+COLOR_PRIMARIO = "#2563EB"
+COLOR_PRIMARIO_HOVER = "#1D4ED8"
+COLOR_SECUNDARIO = "#6B7280"
+COLOR_TEXTO = "#1F2937"
+COLOR_BORDE = "#D1D5DB"
+
+
+# =========================================================
 # TÍTULO
 # =========================================================
 
@@ -38,11 +35,11 @@ titulo = tk.Label(
     ventana,
     text="TRANSFORMACIONES LINEALES — CNC",
     font=("Arial", 22, "bold"),
-    bg="#F4F6F8",
-    fg="#1F2937"
+    bg=COLOR_FONDO,
+    fg=COLOR_TEXTO
 )
 
-titulo.pack(pady=15)
+titulo.pack(pady=(15, 10))
 
 
 # =========================================================
@@ -51,14 +48,14 @@ titulo.pack(pady=15)
 
 contenedor = tk.Frame(
     ventana,
-    bg="#F4F6F8"
+    bg=COLOR_FONDO
 )
 
 contenedor.pack(
     fill="both",
     expand=True,
     padx=20,
-    pady=10
+    pady=5
 )
 
 
@@ -68,11 +65,11 @@ contenedor.pack(
 
 panel_izquierdo = tk.Frame(
     contenedor,
-    bg="white",
-    width=300,
-    height=570,
-    relief="solid",
-    borderwidth=1
+    bg=COLOR_PANEL,
+    width=350,
+    height=600,
+    highlightbackground=COLOR_BORDE,
+    highlightthickness=1
 )
 
 panel_izquierdo.pack(
@@ -84,511 +81,15 @@ panel_izquierdo.pack(
 panel_izquierdo.pack_propagate(False)
 
 
-# Título del panel
-
-label_menu = tk.Label(
-    panel_izquierdo,
-    text="TRANSFORMACIONES",
-    font=("Arial", 15, "bold"),
-    bg="white",
-    fg="#1F2937"
-)
-
-label_menu.pack(pady=(25, 20))
-
-
 # =========================================================
-# BOTÓN ROTACIÓN
-# =========================================================
-
-def abrir_rotacion():
-
-    ventana_rotacion = tk.Toplevel(ventana)
-
-    ventana_rotacion.title("Rotación")
-    ventana_rotacion.geometry("350x350")
-    ventana_rotacion.resizable(False, False)
-
-    tk.Label(
-        ventana_rotacion,
-        text="ROTACIÓN",
-        font=("Arial", 18, "bold")
-    ).pack(pady=20)
-
-    tk.Label(
-        ventana_rotacion,
-        text="Ángulo:"
-    ).pack()
-
-    entrada_angulo = tk.Entry(
-        ventana_rotacion,
-        width=20
-    )
-
-    entrada_angulo.pack(pady=5)
-
-    tk.Label(
-        ventana_rotacion,
-        text="Dirección:"
-    ).pack(pady=(15, 0))
-
-    direccion = tk.StringVar(
-        value="Antihorario"
-    )
-
-    tk.Radiobutton(
-        ventana_rotacion,
-        text="Antihorario",
-        variable=direccion,
-        value="Antihorario"
-    ).pack()
-
-    tk.Radiobutton(
-        ventana_rotacion,
-        text="Horario",
-        variable=direccion,
-        value="Horario"
-    ).pack()
-
-    tk.Label(
-        ventana_rotacion,
-        text="Centro de rotación (X, Y):"
-    ).pack(pady=(15, 5))
-
-    frame_centro = tk.Frame(
-        ventana_rotacion
-    )
-
-    frame_centro.pack()
-
-    entrada_x = tk.Entry(
-        frame_centro,
-        width=8
-    )
-
-    entrada_x.pack(
-        side="left",
-        padx=5
-    )
-
-    entrada_y = tk.Entry(
-        frame_centro,
-        width=8
-    )
-
-    entrada_y.pack(
-        side="left",
-        padx=5
-    )
-
-    def aplicar():
-
-        try:
-            angulo = float(
-                entrada_angulo.get()
-            )
-
-            cx = float(
-                entrada_x.get()
-            )
-
-            cy = float(
-                entrada_y.get()
-            )
-
-            if direccion.get() == "Horario":
-                angulo = -angulo
-
-            theta = math.radians(angulo)
-
-            coseno = math.cos(theta)
-            seno = math.sin(theta)
-
-            nuevos_puntos = []
-
-            for x, y in puntos_originales:
-
-                # Trasladar al centro
-                x1 = x - cx
-                y1 = y - cy
-
-                # Matriz de rotación
-                x2 = x1 * coseno - y1 * seno
-                y2 = x1 * seno + y1 * coseno
-
-                # Regresar
-                x2 += cx
-                y2 += cy
-
-                nuevos_puntos.append(
-                    (x2, y2)
-                )
-
-            messagebox.showinfo(
-                "Rotación",
-                "Rotación aplicada correctamente."
-            )
-
-            ventana_rotacion.destroy()
-
-        except ValueError:
-
-            messagebox.showerror(
-                "Error",
-                "Ingresa valores numéricos."
-            )
-
-    tk.Button(
-        ventana_rotacion,
-        text="APLICAR ROTACIÓN",
-        bg="#2563EB",
-        fg="white",
-        font=("Arial", 10, "bold"),
-        width=20,
-        height=2,
-        command=aplicar
-    ).pack(pady=25)
-
-
-boton_rotacion = tk.Button(
-    panel_izquierdo,
-    text="⟳  ROTACIÓN",
-    font=("Arial", 11, "bold"),
-    bg="#2563EB",
-    fg="white",
-    activebackground="#1D4ED8",
-    activeforeground="white",
-    width=25,
-    height=2,
-    cursor="hand2",
-    command=abrir_rotacion
-)
-
-boton_rotacion.pack(pady=8)
-
-
-# =========================================================
-# BOTÓN HOMOTECIA
-# =========================================================
-
-def abrir_homotecia():
-
-    ventana_homotecia = tk.Toplevel(ventana)
-
-    ventana_homotecia.title("Homotecia")
-    ventana_homotecia.geometry("350x330")
-    ventana_homotecia.resizable(False, False)
-
-    tk.Label(
-        ventana_homotecia,
-        text="HOMOTECIA",
-        font=("Arial", 18, "bold")
-    ).pack(pady=20)
-
-    tk.Label(
-        ventana_homotecia,
-        text="Factor de escala:"
-    ).pack()
-
-    entrada_factor = tk.Entry(
-        ventana_homotecia,
-        width=20
-    )
-
-    entrada_factor.pack(pady=5)
-
-    tk.Label(
-        ventana_homotecia,
-        text="Centro (X, Y):"
-    ).pack(pady=(20, 5))
-
-    frame_centro = tk.Frame(
-        ventana_homotecia
-    )
-
-    frame_centro.pack()
-
-    entrada_x = tk.Entry(
-        frame_centro,
-        width=8
-    )
-
-    entrada_x.pack(
-        side="left",
-        padx=5
-    )
-
-    entrada_y = tk.Entry(
-        frame_centro,
-        width=8
-    )
-
-    entrada_y.pack(
-        side="left",
-        padx=5
-    )
-
-    def aplicar():
-
-        try:
-
-            factor = float(
-                entrada_factor.get()
-            )
-
-            cx = float(
-                entrada_x.get()
-            )
-
-            cy = float(
-                entrada_y.get()
-            )
-
-            nuevos_puntos = []
-
-            for x, y in puntos_originales:
-
-                x2 = cx + factor * (x - cx)
-                y2 = cy + factor * (y - cy)
-
-                nuevos_puntos.append(
-                    (x2, y2)
-                )
-
-            messagebox.showinfo(
-                "Homotecia",
-                "Homotecia aplicada correctamente."
-            )
-
-            ventana_homotecia.destroy()
-
-        except ValueError:
-
-            messagebox.showerror(
-                "Error",
-                "Ingresa valores numéricos."
-            )
-
-    tk.Button(
-        ventana_homotecia,
-        text="APLICAR HOMOTECIA",
-        bg="#059669",
-        fg="white",
-        font=("Arial", 10, "bold"),
-        width=20,
-        height=2,
-        command=aplicar
-    ).pack(pady=25)
-
-
-boton_homotecia = tk.Button(
-    panel_izquierdo,
-    text="↔  HOMOTECIA",
-    font=("Arial", 11, "bold"),
-    bg="#059669",
-    fg="white",
-    activebackground="#047857",
-    activeforeground="white",
-    width=25,
-    height=2,
-    cursor="hand2",
-    command=abrir_homotecia
-)
-
-boton_homotecia.pack(pady=8)
-
-
-# =========================================================
-# BOTÓN REFLEXIÓN
-# =========================================================
-
-def abrir_reflexion():
-
-    ventana_reflexion = tk.Toplevel(ventana)
-
-    ventana_reflexion.title("Reflexión")
-    ventana_reflexion.geometry("350x300")
-    ventana_reflexion.resizable(False, False)
-
-    tk.Label(
-        ventana_reflexion,
-        text="REFLEXIÓN",
-        font=("Arial", 18, "bold")
-    ).pack(pady=20)
-
-    tk.Label(
-        ventana_reflexion,
-        text="Selecciona la línea:"
-    ).pack()
-
-    linea = tk.StringVar(
-        value="Eje X"
-    )
-
-    opciones = [
-        "Eje X",
-        "Eje Y",
-        "Recta Y = X",
-        "Recta Y = -X"
-    ]
-
-    menu = tk.OptionMenu(
-        ventana_reflexion,
-        linea,
-        *opciones
-    )
-
-    menu.config(
-        width=20
-    )
-
-    menu.pack(pady=15)
-
-    def aplicar():
-
-        seleccion = linea.get()
-
-        if seleccion == "Eje X":
-
-            nuevos_puntos = [
-                (x, -y)
-                for x, y in puntos_originales
-            ]
-
-        elif seleccion == "Eje Y":
-
-            nuevos_puntos = [
-                (-x, y)
-                for x, y in puntos_originales
-            ]
-
-        elif seleccion == "Recta Y = X":
-
-            nuevos_puntos = [
-                (y, x)
-                for x, y in puntos_originales
-            ]
-
-        else:
-
-            nuevos_puntos = [
-                (-y, -x)
-                for x, y in puntos_originales
-            ]
-
-        messagebox.showinfo(
-            "Reflexión",
-            "Reflexión aplicada correctamente."
-        )
-
-        ventana_reflexion.destroy()
-
-    tk.Button(
-        ventana_reflexion,
-        text="APLICAR REFLEXIÓN",
-        bg="#7C3AED",
-        fg="white",
-        font=("Arial", 10, "bold"),
-        width=20,
-        height=2,
-        command=aplicar
-    ).pack(pady=25)
-
-
-boton_reflexion = tk.Button(
-    panel_izquierdo,
-    text="↔  REFLEXIÓN",
-    font=("Arial", 11, "bold"),
-    bg="#7C3AED",
-    fg="white",
-    activebackground="#6D28D9",
-    activeforeground="white",
-    width=25,
-    height=2,
-    cursor="hand2",
-    command=abrir_reflexion
-)
-
-boton_reflexion.pack(pady=8)
-
-
-# =========================================================
-# SEPARADOR
-# =========================================================
-
-tk.Frame(
-    panel_izquierdo,
-    height=2,
-    bg="#E5E7EB"
-).pack(
-    fill="x",
-    padx=25,
-    pady=20
-)
-
-
-# =========================================================
-# BOTÓN VER ORIGINAL
-# =========================================================
-
-def ver_original():
-
-    dibujar_pieza(
-        puntos_originales
-    )
-
-
-boton_original = tk.Button(
-    panel_izquierdo,
-    text="VER ORIGINAL",
-    font=("Arial", 10, "bold"),
-    bg="#6B7280",
-    fg="white",
-    width=25,
-    height=2,
-    cursor="hand2",
-    command=ver_original
-)
-
-boton_original.pack(pady=6)
-
-
-# =========================================================
-# BOTÓN NUEVA PIEZA
-# =========================================================
-
-def nueva_pieza():
-
-    messagebox.showinfo(
-        "Nueva pieza",
-        "Aquí podrás ingresar una nueva pieza."
-    )
-
-
-boton_nueva = tk.Button(
-    panel_izquierdo,
-    text="NUEVA PIEZA",
-    font=("Arial", 10, "bold"),
-    bg="#374151",
-    fg="white",
-    width=25,
-    height=2,
-    cursor="hand2",
-    command=nueva_pieza
-)
-
-boton_nueva.pack(pady=6)
-
-
-# =========================================================
-# PANEL DERECHO - PLANO CARTESIANO
+# PANEL DERECHO
 # =========================================================
 
 panel_derecho = tk.Frame(
     contenedor,
-    bg="white",
-    relief="solid",
-    borderwidth=1
+    bg=COLOR_PANEL,
+    highlightbackground=COLOR_BORDE,
+    highlightthickness=1
 )
 
 panel_derecho.pack(
@@ -598,54 +99,674 @@ panel_derecho.pack(
 )
 
 
-# Título del plano
+# =========================================================
+# TÍTULO PANEL IZQUIERDO
+# =========================================================
+
+titulo_panel = tk.Label(
+    panel_izquierdo,
+    text="CONTROLES",
+    font=("Arial", 15, "bold"),
+    bg=COLOR_PANEL,
+    fg=COLOR_TEXTO
+)
+
+titulo_panel.pack(
+    pady=(15, 8)
+)
+
+
+# =========================================================
+# FUNCIÓN PARA CREAR TÍTULOS DE SECCIÓN
+# =========================================================
+
+def titulo_seccion(texto):
+
+    return tk.Label(
+        panel_izquierdo,
+        text=texto,
+        font=("Arial", 10, "bold"),
+        bg=COLOR_PANEL,
+        fg=COLOR_TEXTO,
+        anchor="w"
+    )
+
+
+# =========================================================
+# 1. COORDENADAS
+# =========================================================
+
+titulo_seccion("1. COORDENADAS").pack(
+    fill="x",
+    padx=20,
+    pady=(5, 3)
+)
+
+frame_coordenadas = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_coordenadas.pack(
+    padx=20,
+    fill="x"
+)
+
+
+# X
+
+tk.Label(
+    frame_coordenadas,
+    text="X:",
+    font=("Arial", 10),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=0,
+    padx=(0, 5)
+)
+
+entrada_x = tk.Entry(
+    frame_coordenadas,
+    width=8,
+    font=("Arial", 10)
+)
+
+entrada_x.grid(
+    row=0,
+    column=1,
+    padx=(0, 15)
+)
+
+
+# Y
+
+tk.Label(
+    frame_coordenadas,
+    text="Y:",
+    font=("Arial", 10),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=2,
+    padx=(0, 5)
+)
+
+entrada_y = tk.Entry(
+    frame_coordenadas,
+    width=8,
+    font=("Arial", 10)
+)
+
+entrada_y.grid(
+    row=0,
+    column=3
+)
+
+
+def crear_punto():
+
+    print(
+        "Punto creado:",
+        entrada_x.get(),
+        entrada_y.get()
+    )
+
+
+tk.Button(
+    panel_izquierdo,
+    text="Crear punto",
+    font=("Arial", 9, "bold"),
+    bg=COLOR_PRIMARIO,
+    fg="white",
+    activebackground=COLOR_PRIMARIO_HOVER,
+    activeforeground="white",
+    cursor="hand2",
+    command=crear_punto
+).pack(
+    pady=(5, 8)
+)
+
+
+# =========================================================
+# 2. FIGURAS PREESTABLECIDAS
+# =========================================================
+
+titulo_seccion("2. FIGURAS PREESTABLECIDAS").pack(
+    fill="x",
+    padx=20,
+    pady=(2, 3)
+)
+
+frame_figuras = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_figuras.pack(
+    padx=20,
+    fill="x"
+)
+
+
+figura_seleccionada = tk.StringVar()
+
+combo_figuras = ttk.Combobox(
+    frame_figuras,
+    textvariable=figura_seleccionada,
+    values=[
+        "Triángulo",
+        "Cuadrado",
+        "Rectángulo",
+        "Pentágono",
+        "Figura L"
+    ],
+    state="readonly",
+    width=22
+)
+
+combo_figuras.set("Seleccionar figura")
+
+combo_figuras.pack(
+    side="left",
+    padx=(0, 8)
+)
+
+
+def aceptar_figura():
+
+    print(
+        "Figura seleccionada:",
+        figura_seleccionada.get()
+    )
+
+
+tk.Button(
+    frame_figuras,
+    text="Aceptar",
+    font=("Arial", 9, "bold"),
+    bg=COLOR_SECUNDARIO,
+    fg="white",
+    cursor="hand2",
+    command=aceptar_figura
+).pack(
+    side="left"
+)
+
+
+# =========================================================
+# 3. REFLEXIÓN
+# =========================================================
+
+titulo_seccion("3. REFLEXIÓN").pack(
+    fill="x",
+    padx=20,
+    pady=(8, 3)
+)
+
+frame_reflexion = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_reflexion.pack(
+    padx=20
+)
+
+
+def reflexion(tipo):
+
+    print(
+        "Reflexión:",
+        tipo
+    )
+
+
+# Fila 1
+
+tk.Button(
+    frame_reflexion,
+    text="EJE X",
+    width=11,
+    font=("Arial", 9, "bold"),
+    command=lambda: reflexion("EJE X")
+).grid(
+    row=0,
+    column=0,
+    padx=3,
+    pady=3
+)
+
+tk.Button(
+    frame_reflexion,
+    text="EJE Y",
+    width=11,
+    font=("Arial", 9, "bold"),
+    command=lambda: reflexion("EJE Y")
+).grid(
+    row=0,
+    column=1,
+    padx=3,
+    pady=3
+)
+
+
+# Fila 2
+
+tk.Button(
+    frame_reflexion,
+    text="BISECTRIZ",
+    width=11,
+    font=("Arial", 9, "bold"),
+    command=lambda: reflexion("BISECTRIZ")
+).grid(
+    row=1,
+    column=0,
+    padx=3,
+    pady=3
+)
+
+tk.Button(
+    frame_reflexion,
+    text="ORIGEN",
+    width=11,
+    font=("Arial", 9, "bold"),
+    command=lambda: reflexion("ORIGEN")
+).grid(
+    row=1,
+    column=1,
+    padx=3,
+    pady=3
+)
+
+
+# Fila 3
+
+tk.Button(
+    frame_reflexion,
+    text="Y = -X",
+    width=11,
+    font=("Arial", 9, "bold"),
+    command=lambda: reflexion("Y = -X")
+).grid(
+    row=2,
+    column=0,
+    padx=3,
+    pady=3
+)
+
+
+# =========================================================
+# 4. HOMOTECIA
+# =========================================================
+
+titulo_seccion("4. HOMOTECIA").pack(
+    fill="x",
+    padx=20,
+    pady=(8, 3)
+)
+
+frame_homotecia = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_homotecia.pack(
+    padx=20
+)
+
+
+# X
+
+tk.Label(
+    frame_homotecia,
+    text="X:",
+    font=("Arial", 9),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=0,
+    padx=3
+)
+
+hom_x = tk.Entry(
+    frame_homotecia,
+    width=6
+)
+
+hom_x.grid(
+    row=0,
+    column=1,
+    padx=3
+)
+
+
+# Y
+
+tk.Label(
+    frame_homotecia,
+    text="Y:",
+    font=("Arial", 9),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=2,
+    padx=3
+)
+
+hom_y = tk.Entry(
+    frame_homotecia,
+    width=6
+)
+
+hom_y.grid(
+    row=0,
+    column=3,
+    padx=3
+)
+
+
+# K
+
+tk.Label(
+    frame_homotecia,
+    text="K:",
+    font=("Arial", 9),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=4,
+    padx=3
+)
+
+hom_k = tk.Entry(
+    frame_homotecia,
+    width=6
+)
+
+hom_k.grid(
+    row=0,
+    column=5,
+    padx=3
+)
+
+
+def aplicar_homotecia():
+
+    print(
+        "Homotecia:",
+        hom_x.get(),
+        hom_y.get(),
+        hom_k.get()
+    )
+
+
+tk.Button(
+    panel_izquierdo,
+    text="Aceptar",
+    font=("Arial", 9, "bold"),
+    bg=COLOR_PRIMARIO,
+    fg="white",
+    cursor="hand2",
+    command=aplicar_homotecia
+).pack(
+    pady=(5, 8)
+)
+
+
+# =========================================================
+# 5. ROTACIÓN
+# =========================================================
+
+titulo_seccion("5. ROTACIÓN").pack(
+    fill="x",
+    padx=20,
+    pady=(3, 3)
+)
+
+
+# Ángulo
+
+frame_angulo = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_angulo.pack(
+    padx=20,
+    fill="x"
+)
+
+tk.Label(
+    frame_angulo,
+    text="Ángulo:",
+    font=("Arial", 9),
+    bg=COLOR_PANEL
+).pack(
+    side="left",
+    padx=(0, 5)
+)
+
+entrada_angulo = tk.Entry(
+    frame_angulo,
+    width=10
+)
+
+entrada_angulo.pack(
+    side="left"
+)
+
+
+# Punto de rotación
+
+tk.Label(
+    panel_izquierdo,
+    text="Punto de rotación:",
+    font=("Arial", 9, "bold"),
+    bg=COLOR_PANEL,
+    fg=COLOR_TEXTO
+).pack(
+    anchor="w",
+    padx=20,
+    pady=(5, 2)
+)
+
+
+frame_rotacion = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_rotacion.pack(
+    padx=20
+)
+
+
+tk.Label(
+    frame_rotacion,
+    text="X:",
+    font=("Arial", 9),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=0
+)
+
+rot_x = tk.Entry(
+    frame_rotacion,
+    width=7
+)
+
+rot_x.grid(
+    row=0,
+    column=1,
+    padx=5
+)
+
+
+tk.Label(
+    frame_rotacion,
+    text="Y:",
+    font=("Arial", 9),
+    bg=COLOR_PANEL
+).grid(
+    row=0,
+    column=2
+)
+
+rot_y = tk.Entry(
+    frame_rotacion,
+    width=7
+)
+
+rot_y.grid(
+    row=0,
+    column=3,
+    padx=5
+)
+
+
+def aplicar_rotacion():
+
+    print(
+        "Rotación:",
+        entrada_angulo.get(),
+        rot_x.get(),
+        rot_y.get()
+    )
+
+
+tk.Button(
+    panel_izquierdo,
+    text="Aceptar",
+    font=("Arial", 9, "bold"),
+    bg=COLOR_PRIMARIO,
+    fg="white",
+    cursor="hand2",
+    command=aplicar_rotacion
+).pack(
+    pady=(5, 8)
+)
+
+
+# =========================================================
+# 6. ACCIONES GENERALES
+# =========================================================
+
+frame_acciones = tk.Frame(
+    panel_izquierdo,
+    bg=COLOR_PANEL
+)
+
+frame_acciones.pack(
+    side="bottom",
+    pady=12
+)
+
+
+def limpiar():
+
+    entrada_x.delete(0, tk.END)
+    entrada_y.delete(0, tk.END)
+
+    hom_x.delete(0, tk.END)
+    hom_y.delete(0, tk.END)
+    hom_k.delete(0, tk.END)
+
+    entrada_angulo.delete(0, tk.END)
+
+    rot_x.delete(0, tk.END)
+    rot_y.delete(0, tk.END)
+
+    combo_figuras.set("Seleccionar figura")
+
+    print("Formulario limpiado")
+
+
+def regresar():
+
+    ventana.destroy()
+
+
+tk.Button(
+    frame_acciones,
+    text="LIMPIAR",
+    width=12,
+    height=2,
+    font=("Arial", 9, "bold"),
+    bg="#E5E7EB",
+    fg=COLOR_TEXTO,
+    cursor="hand2",
+    command=limpiar
+).pack(
+    side="left",
+    padx=5
+)
+
+
+tk.Button(
+    frame_acciones,
+    text="REGRESAR",
+    width=12,
+    height=2,
+    font=("Arial", 9, "bold"),
+    bg="#DC2626",
+    fg="white",
+    activebackground="#B91C1C",
+    cursor="hand2",
+    command=regresar
+).pack(
+    side="left",
+    padx=5
+)
+
+
+# =========================================================
+# PLANO CARTESIANO
+# =========================================================
 
 label_plano = tk.Label(
     panel_derecho,
     text="PLANO CARTESIANO",
     font=("Arial", 15, "bold"),
-    bg="white",
-    fg="#1F2937"
+    bg=COLOR_PANEL,
+    fg=COLOR_TEXTO
 )
 
 label_plano.pack(
-    pady=10
+    pady=(15, 5)
 )
 
 
-# =========================================================
-# CANVAS
-# =========================================================
-
 canvas = tk.Canvas(
     panel_derecho,
-    width=820,
-    height=500,
+    width=790,
+    height=530,
     bg="white",
     highlightthickness=0
 )
 
 canvas.pack(
     padx=10,
-    pady=10
+    pady=5
 )
 
 
 # =========================================================
-# DIBUJAR PLANO CARTESIANO
+# DIBUJAR PLANO
 # =========================================================
 
 def dibujar_plano():
 
     canvas.delete("all")
 
-    ancho = 820
-    alto = 500
+    ancho = 790
+    alto = 530
 
     centro_x = ancho // 2
     centro_y = alto // 2
 
-    escala = 45
+    escala = 40
 
     # Cuadrícula vertical
     for x in range(
@@ -697,7 +818,7 @@ def dibujar_plano():
         width=2
     )
 
-    # Números X
+    # Números eje X
     for i in range(-9, 10):
 
         if i == 0:
@@ -707,14 +828,14 @@ def dibujar_plano():
 
         canvas.create_text(
             x,
-            centro_y + 15,
+            centro_y + 14,
             text=str(i),
             font=("Arial", 8),
             fill="#6B7280"
         )
 
-    # Números Y
-    for i in range(-5, 6):
+    # Números eje Y
+    for i in range(-6, 7):
 
         if i == 0:
             continue
@@ -722,15 +843,14 @@ def dibujar_plano():
         y = centro_y - i * escala
 
         canvas.create_text(
-            centro_x + 15,
+            centro_x + 14,
             y,
             text=str(i),
             font=("Arial", 8),
             fill="#6B7280"
         )
 
-    # Etiquetas de los ejes
-
+    # X
     canvas.create_text(
         ancho - 15,
         centro_y - 15,
@@ -739,6 +859,7 @@ def dibujar_plano():
         fill="#374151"
     )
 
+    # Y
     canvas.create_text(
         centro_x + 15,
         15,
@@ -748,68 +869,7 @@ def dibujar_plano():
     )
 
 
-# =========================================================
-# DIBUJAR PIEZA
-# =========================================================
-
-def dibujar_pieza(puntos):
-
-    dibujar_plano()
-
-    centro_x = 820 // 2
-    centro_y = 500 // 2
-
-    escala = 45
-
-    coordenadas = []
-
-    for x, y in puntos:
-
-        px = centro_x + x * escala
-        py = centro_y - y * escala
-
-        coordenadas.append(
-            (px, py)
-        )
-
-    # Dibujar polígono
-
-    canvas.create_polygon(
-        coordenadas,
-        fill="#93C5FD",
-        outline="#2563EB",
-        width=3
-    )
-
-    # Dibujar vértices
-
-    for i, (px, py) in enumerate(coordenadas):
-
-        canvas.create_oval(
-            px - 5,
-            py - 5,
-            px + 5,
-            py + 5,
-            fill="#2563EB",
-            outline="white"
-        )
-
-        canvas.create_text(
-            px + 12,
-            py - 10,
-            text=f"P{i + 1}",
-            font=("Arial", 9, "bold"),
-            fill="#1F2937"
-        )
-
-
-# =========================================================
-# MOSTRAR PIEZA AL INICIAR
-# =========================================================
-
-dibujar_pieza(
-    puntos_originales
-)
+dibujar_plano()
 
 
 # =========================================================
